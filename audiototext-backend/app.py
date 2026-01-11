@@ -1,8 +1,3 @@
-# app.py
-# Single-file server that reuses your transcription worker logic and exposes a FastAPI API.
-# Run: python app.py
-# NOTE: set SMTP_USERNAME and SMTP_PASSWORD as env vars if you want email sending.
-
 import os
 import time
 import tempfile
@@ -12,7 +7,6 @@ import queue
 import traceback
 from email.message import EmailMessage
 
-# OPTIONAL: small Windows asyncio fix if you use Windows and uvicorn
 import sys
 if sys.platform == "win32":
     try:
@@ -21,20 +15,18 @@ if sys.platform == "win32":
     except Exception:
         pass
 
-# --- third-party imports ---
+
 from typing import Optional
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.responses import JSONResponse
 import uvicorn
 
-# Audio / model deps (make sure these are installed)
 import whisper
 import torch
 from pydub import AudioSegment
 import smtplib
 
-# ---------------- CONFIG ----------------
-MODEL_NAME = os.getenv("MODEL_NAME", "tiny")  # change to "small" etc if desired
+MODEL_NAME = os.getenv("MODEL_NAME", "tiny")  
 SEG_LEN_SECONDS = int(os.getenv("SEG_LEN_SECONDS", "20"))
 CHUNK_THRESHOLD_S = int(os.getenv("CHUNK_THRESHOLD_S", "40"))
 MAX_UPLOAD_S = int(os.getenv("MAX_UPLOAD_S", "600"))
@@ -47,9 +39,7 @@ SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
 
 EMAIL_FROM = SMTP_USERNAME if SMTP_USERNAME else "no-reply@example.com"
 EMAIL_SUBJECT_TEMPLATE = "Your transcription (job {job_id})"
-# ------------------------------------------------
 
-# ---------------- job queue & worker ----------------
 job_q = queue.Queue()
 WORKER_THREAD = None
 SHUTDOWN_EVENT = threading.Event()
@@ -62,7 +52,6 @@ device = get_device()
 model = whisper.load_model(MODEL_NAME, device=device)
 print(f"[app] Model '{MODEL_NAME}' loaded on {device}.")
 
-# ---------- audio helpers ----------
 def ensure_wav_copy(in_path):
     """
     Convert input audio to WAV file in tempdir and return path + duration_s.
@@ -125,7 +114,6 @@ def transcribe_file(audio_path):
         except Exception:
             pass
 
-# -------- email helper (with fallback save) --------
 def send_email_with_fallback(to_address: str, subject: str, body_text: str,
                              attachments: list = None, fallback_save_path: str = None):
     """
@@ -168,7 +156,6 @@ def send_email_with_fallback(to_address: str, subject: str, body_text: str,
             print("[email] Fallback save failed:", e)
     return False, err
 
-# ---------- worker ----------
 def worker_loop():
     print("[worker] Background worker started, waiting for jobs...")
     while not SHUTDOWN_EVENT.is_set():
@@ -206,7 +193,7 @@ def worker_loop():
             else:
                 print(f"[worker] Email successfully sent for job {job_id} -> {email}")
 
-            # cleanup uploaded audio file
+           
             try:
                 if os.path.exists(audio_path):
                     os.remove(audio_path)
@@ -222,22 +209,21 @@ def start_worker():
         WORKER_THREAD = threading.Thread(target=worker_loop, daemon=True, name="transcribe-worker")
         WORKER_THREAD.start()
 
-# ---------- FastAPI app ----------
 app = FastAPI(title="Audio Transcription API")
 
 @app.post("/api/submit")
 async def submit(email: str = Form(...), audio: UploadFile = File(...)):
-    # basic validation
+
     if "@" not in email:
         return JSONResponse({"error": "Invalid email"}, status_code=400)
 
-    # save file to temp
+   
     suffix = os.path.splitext(audio.filename)[1] or ".wav"
     dest = os.path.join(tempfile.gettempdir(), f"upload_{uuid.uuid4().hex}{suffix}")
     with open(dest, "wb") as f:
         f.write(await audio.read())
 
-    # quick duration guard
+   
     try:
         a = AudioSegment.from_file(dest)
         duration_s = len(a) / 1000.0
@@ -267,7 +253,7 @@ async def submit(email: str = Form(...), audio: UploadFile = File(...)):
 def health():
     return {"status": "ok"}
 
-# ------------- shutdown handler -------------
+
 import atexit
 def shutdown():
     SHUTDOWN_EVENT.set()
@@ -275,8 +261,7 @@ def shutdown():
         WORKER_THREAD.join(timeout=2.0)
 atexit.register(shutdown)
 
-# ------------- run server -------------
+
 if __name__ == "__main__":
     print(f"[app] Starting API on port {PORT} ...")
-    # Use uvicorn programmatically to make it easy to run with python app.py
     uvicorn.run("app:app", host="127.0.0.1", port=PORT, log_level="info", reload=False)
