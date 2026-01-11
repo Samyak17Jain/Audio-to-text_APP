@@ -17,7 +17,7 @@ This project demonstrates **real-world system design**, not just a demo:
 ### 1️⃣ Upload Audio
 Users enter their email and upload an audio file (MP3 / WAV / M4A).
 
-![Upload UI](Screenshots/ui.png)
+![Upload UI](Screenshots/UI.png)
 
 ---
 
@@ -32,7 +32,7 @@ The file is sent to the backend, processed using an AI speech-to-text model, and
 Once completed, the transcription is emailed to the user.  
 Recent uploads are tracked in the UI.
 
-![Success](Screenshots/success.png)
+![Success](Screenshots/sucess.png)
 
 ---
 
