@@ -17,14 +17,14 @@ This project demonstrates **real-world system design**, not just a demo:
 ### 1️⃣ Upload Audio
 Users enter their email and upload an audio file (MP3 / WAV / M4A).
 
-![Upload UI](screenshots/ui.png)
+![Upload UI](Screenshots/ui.png)
 
 ---
 
 ### 2️⃣ Processing & Transcription
 The file is sent to the backend, processed using an AI speech-to-text model, and queued for delivery.
 
-![Processing](screenshots/processing.png)
+![Processing](Screenshots/processing.png)
 
 ---
 
@@ -32,7 +32,7 @@ The file is sent to the backend, processed using an AI speech-to-text model, and
 Once completed, the transcription is emailed to the user.  
 Recent uploads are tracked in the UI.
 
-![Success](screenshots/success.png)
+![Success](Screenshots/success.png)
 
 ---
 
@@ -53,12 +53,12 @@ Recent uploads are tracked in the UI.
 
 ##  Features
 
-- 🎧 Drag & drop audio upload
-- 📧 Email-based delivery of transcription
-- 🧠 AI-powered speech recognition (Whisper)
-- 🕒 Upload history tracking
-- 🔒 Secure handling of files
-- 📱 Responsive, clean UI
+-  Drag & drop audio upload
+-  Email-based delivery of transcription
+-  AI-powered speech recognition (Whisper)
+-  Upload history tracking
+-  Secure handling of files
+-  Responsive, clean UI
 
 ---
 
@@ -80,7 +80,6 @@ Recent uploads are tracked in the UI.
 - REST APIs
 - Environment-based configuration
 
----
 
-##  Project Structure
+
 
