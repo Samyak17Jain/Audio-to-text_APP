@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+openai-whisper
+torch
+pydub
+SpeechRecognition
+python-dotenv
